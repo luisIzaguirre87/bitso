@@ -1,0 +1,56 @@
+apply plugin:'idea'
+apply plugin:'eclipse'
+apply plugin:'maven'
+
+subprojects {
+    apply plugin:'java'
+    apply plugin:'idea'
+    apply plugin:'eclipse'
+    apply plugin:'maven'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        testCompile 'junit:junit:4.12'
+    }
+    pom {
+        project {
+            groupId 'com.bitso'
+            artifactId project.name
+            version version
+            packaging 'jar'
+            parent {
+                groupId 'com.bitso'
+                artifactId 'parentpom'
+                version '0.0.0'
+            }
+        }
+    }
+    task poms {
+        doLast {
+            def p = pom()
+            p.model.addProperty("maven.compiler.source",'1.8')
+            p.model.addProperty("maven.compiler.target",'1.8')
+            if (project.name == 'service') p = p.withXml(dependencyManagement.pomConfigurer)
+            p.writeTo('pom.xml')
+        }
+    }
+}
+
+task poms {
+  doLast {
+    pom {
+        project {
+            groupId 'com.bitso'
+            artifactId 'parentpom'
+            version '0.0.0'
+            packaging 'pom'
+            modules {
+                module 'model'
+                module 'model-ram'
+                module 'service'
+            }
+        }
+    }.writeTo('pom.xml')
+  }
+}
